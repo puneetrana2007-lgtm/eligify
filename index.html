@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELIGIFY | Find Your Dream Government Job</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="#" class="logo">ELIG<span>IFY</span></a>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#checker">Check Eligibility</a></li>
+                <li><a href="#trending">Trending Jobs</a></li>
+                <li><a href="#notifications">Notifications</a></li>
+            </ul>
+            <a href="#checker" class="btn btn-primary nav-btn">Check Now</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero" id="home">
+        <div class="hero-bg-shapes"></div>
+        <div class="container">
+            <div class="hero-content">
+                <h1>Find Government Jobs <br><span class="text-gradient">You Are Eligible For</span></h1>
+                <p>Enter your details and instantly discover government job opportunities matching your profile. No more manual searching through PDFs.</p>
+                <div class="hero-btns">
+                    <a href="#checker" class="btn btn-primary btn-lg">Check Eligibility</a>
+                    <a href="#trending" class="btn btn-outline btn-lg">View Trending Jobs</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Statistics Section -->
+    <section class="stats">
+        <div class="container stats-grid">
+            <div class="stat-item">
+                <h2 class="counter" data-target="500">0</h2>
+                <p>Govt Jobs Listed</p>
+            </div>
+            <div class="stat-item">
+                <h2 class="counter" data-target="28">0</h2>
+                <p>States Covered</p>
+            </div>
+            <div class="stat-item">
+                <h2 class="counter" data-target="1000000">0</h2>
+                <p>Active Users</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Eligibility Checker Section -->
+    <section class="checker-section" id="checker">
+        <div class="container">
+            <div class="section-header">
+                <span>Smart Match</span>
+                <h2>Eligibility Checker</h2>
+                <p>Fill in your profile details to see live job openings.</p>
+            </div>
+
+            <form id="eligibilityForm" class="checker-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Qualification</label>
+                        <select id="qualification" required>
+                            <option value="">Select Qualification</option>
+                            <option value="10th">10th Pass</option>
+                            <option value="12th">12th Pass</option>
+                            <option value="Diploma">Diploma</option>
+                            <option value="Graduate">Graduate</option>
+                            <option value="Post Graduate">Post Graduate</option>
+                            <option value="ITI">ITI</option>
+                            <option value="Engineering">Engineering</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Age</label>
+                        <input type="number" id="age" placeholder="Enter age" min="18" max="60" required>
+                    </div>
+                    <div class="form-group">
+                        <label>State</label>
+                        <select id="state" required>
+                            <option value="">Select State</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Uttar Pradesh">Uttar Pradesh</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <!-- More states can be added -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Category (Optional)</label>
+                        <select id="category">
+                            <option value="General">General</option>
+                            <option value="OBC">OBC</option>
+                            <option value="SC">SC</option>
+                            <option value="ST">ST</option>
+                            <option value="EWS">EWS</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Job Type Preference</label>
+                        <div class="job-type-options">
+                            <label class="chip"><input type="checkbox" name="jobType" value="Central"> Central Govt</label>
+                            <label class="chip"><input type="checkbox" name="jobType" value="State"> State Govt</label>
+                            <label class="chip"><input type="checkbox" name="jobType" value="PSU"> PSU</label>
+                            <label class="chip"><input type="checkbox" name="jobType" value="Defence"> Defence</label>
+                            <label class="chip"><input type="checkbox" name="jobType" value="Banking"> Banking</label>
+                            <label class="chip"><input type="checkbox" name="jobType" value="Railway"> Railway</label>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Check Eligible Jobs</button>
+            </form>
+
+            <!-- Results Section (Dynamic) -->
+            <div id="resultsArea" class="results-container hidden">
+                <div class="results-header">
+                    <h3>Jobs Matching Your Profile</h3>
+                    <div class="quick-filters">
+                        <button class="filter-btn active">All</button>
+                        <button class="filter-btn">High Salary</button>
+                        <button class="filter-btn">Closing Soon</button>
+                    </div>
+                </div>
+                <div class="results-grid" id="jobCards">
+                    <!-- Cards will be injected by JS -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trending Section -->
+    <section class="trending-section" id="trending">
+        <div class="container">
+            <div class="section-header">
+                <h2>Trending Government Jobs</h2>
+            </div>
+            <div class="trending-grid">
+                <div class="trending-card">
+                    <div class="trend-badge">Hot</div>
+                    <i class="fas fa-university"></i>
+                    <h4>SBI PO 2026</h4>
+                    <p>2000+ Vacancies</p>
+                </div>
+                <div class="trending-card">
+                    <div class="trend-badge">Hot</div>
+                    <i class="fas fa-train"></i>
+                    <h4>RRB NTPC</h4>
+                    <p>35000+ Vacancies</p>
+                </div>
+                <div class="trending-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h4>SSC CGL</h4>
+                    <p>7500+ Vacancies</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="newsletter">
+        <div class="container">
+            <div class="newsletter-box">
+                <div class="newsletter-text">
+                    <h3>Never Miss an Update</h3>
+                    <p>Get instant job alerts matching your eligibility directly in your inbox.</p>
+                </div>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Enter your email" required>
+                    <button type="submit" class="btn btn-dark">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-col">
+                <a href="#" class="logo">ELIG<span>IFY</span></a>
+                <p>Empowering job seekers with smart eligibility matching for a brighter future in the public sector.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">How it works</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Contact Support</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Categories</h4>
+                <ul>
+                    <li><a href="#">Banking Jobs</a></li>
+                    <li><a href="#">Defence Jobs</a></li>
+                    <li><a href="#">Railway Jobs</a></li>
+                    <li><a href="#">Teaching Jobs</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 ELIGIFY – Government Job Eligibility Platform</p>
+        </div>
+    </footer>
+
+    <script src="scripts.js"></script>
+</body>
+</html>

@@ -24,24 +24,31 @@ $sql = "SELECT * FROM jobs WHERE
 
 // Add Job Type filtering if any are selected
 if (!empty($jobTypes)) {
-    // Create a string for the IN clause (?,?,?)
-    $placeholders = implode(',', array_fill(0, count($jobTypes), '?'));
-    $sql .= " AND job_type IN ($placeholders)";
+    $placeholders = [];
+    foreach (array_keys($jobTypes) as $index) {
+        $placeholders[] = ':jobType' . $index;
+    }
+    $sql .= " AND job_type IN (" . implode(',', $placeholders) . ")";
 }
 
 $stmt = $pdo->prepare($sql);
 
-// Bind basic parameters
-$stmt->bindParam(':qual', $qualification);
-$stmt->bindParam(':age', $age);
-$stmt->bindParam(':state', $state);
+// Prepare parameters array
+$params = [
+    ':qual' => $qualification,
+    ':age' => $age,
+    ':state' => $state
+];
 
-// Bind Job Type array parameters if they exist
+// Add job type parameters if they exist
 if (!empty($jobTypes)) {
-    $stmt->execute(array_merge([$qualification, $age, $state], $jobTypes));
-} else {
-    $stmt->execute();
+    foreach ($jobTypes as $index => $jobType) {
+        $params[':jobType' . $index] = $jobType;
+    }
 }
+
+// Execute with parameters
+$stmt->execute($params);
 
 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test ai_chat.php</title>
+    <style>
+        body { font-family: Arial; max-width: 800px; margin: 50px auto; }
+        textarea { width: 100%; height: 400px; padding: 10px; font-family: monospace; }
+        button { padding: 10px 20px; margin: 10px 5px 0 0; cursor: pointer; }
+        .button-group { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test ai_chat.php Endpoint</h1>
+    
+    <div class="button-group">
+        <button onclick="testChat('What is SSC CGL exam?')">Test: SSC</button>
+        <button onclick="testChat('Tell me about UPSC')">Test: UPSC</button>
+        <button onclick="testChat('Banking job eligibility')">Test: Banking</button>
+    </div>
+
+    <h2>Raw Response:</h2>
+    <textarea id="output" readonly></textarea>
+
+    <script>
+        async function testChat(message) {
+            const output = document.getElementById('output');
+            output.value = 'Sending: ' + message + '\n\n';
+            
+            try {
+                const response = await fetch('ai_chat.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                output.value += 'Status: ' + response.status + ' ' + response.statusText + '\n\n';
+                
+                // Get response as text first
+                const text = await response.text();
+                output.value += 'Raw Response:\n' + text + '\n\n';
+                
+                // Try to parse as JSON
+                try {
+                    const data = JSON.parse(text);
+                    output.value += 'Parsed JSON:\n' + JSON.stringify(data, null, 2) + '\n\n';
+                    
+                    if (data.success) {
+                        output.value += '✅ SUCCESS!\n';
+                        output.value += 'AI Response: ' + data.response + '\n';
+                    } else {
+                        output.value += '❌ ERROR\n';
+                        output.value += 'Error: ' + (data.error || 'Unknown') + '\n';
+                    }
+                } catch (e) {
+                    output.value += 'Failed to parse as JSON: ' + e.message + '\n';
+                }
+                
+            } catch (error) {
+                output.value += '❌ Network Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

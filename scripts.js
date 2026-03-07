@@ -377,62 +377,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatInput = document.getElementById('chatInput');
     const chatMessages = document.getElementById('chatMessages');
 
-    // Initialize Gemini API (genai)
-    let genai = null;
-    let model = null;
-    let isApiReady = false;
-
-    // Wait for Gemini library to load, then fetch API key and initialize
-    async function initializeGemini() {
-        try {
-            // Wait for genaiReady flag to be set by module script
-            let attempts = 0;
-            while (!window.genaiReady && attempts < 50) {
-                await new Promise(resolve => setTimeout(resolve, 100));
-                attempts++;
-            }
-
-            if (!window.GoogleGenerativeAI) {
-                console.error('Google Generative AI library failed to load');
-                return;
-            }
-
-            // Fetch API key from config.php
-            const response = await fetch('config.php?action=get_api_key');
-            const data = await response.json();
-            
-            if (data.status === 'missing' || !data.api_key) {
-                console.error('Gemini API key not found in .env file');
-                return;
-            }
-
-            // Initialize with the API key
-            genai = new window.GoogleGenerativeAI(data.api_key);
-            model = genai.getGenerativeModel({ model: 'gemini-2.5-flash' });
-            isApiReady = true;
-            console.log('✅ Gemini API initialized successfully with gemini-2.5-flash');
-        } catch (error) {
-            console.error('❌ Error initializing Gemini API:', error);
-        }
-    }
-
-    // Initialize when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeGemini);
-    } else {
-        initializeGemini();
-    }
-
-    // Create system prompt for job eligibility context
-    const systemPrompt = `You are Eligify AI, a helpful assistant for government job seekers in India. You help users understand:
-- Government job eligibility criteria
-- Different types of exams (SSC, UPSC, Banking, Railway, etc.)
-- Qualification requirements
-- Application processes
-- Job benefits and salary information
-
-Keep responses concise, friendly, and relevant to government jobs. If a user asks something completely unrelated to government jobs, politely redirect them.`;
-
     // Toggle chat panel
     aiBtn.addEventListener('click', () => {
         if (chatPanel.classList.contains('hidden')) {
@@ -446,7 +390,7 @@ Keep responses concise, friendly, and relevant to government jobs. If a user ask
         aiBtn.style.display = 'flex';
     });
 
-    // Handle chat messages with Gemini API
+    // Handle chat messages with Gemini API via backend
     chatForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const message = chatInput.value.trim();
@@ -481,31 +425,34 @@ Keep responses concise, friendly, and relevant to government jobs. If a user ask
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
         try {
-            // Check if API is ready
-            if (!isApiReady || !model) {
-                const errorMsg = document.createElement('div');
-                errorMsg.className = 'flex justify-start';
-                errorMsg.innerHTML = `
-                    <div class="bg-red-100 text-red-900 px-4 py-2 rounded-lg max-w-xs text-sm rounded-tl-none">
-                        ⚠️ Gemini API is initializing. Please try again in a moment...
-                    </div>
-                `;
-                if (chatMessages.contains(loadingMsg)) {
-                    chatMessages.removeChild(loadingMsg);
-                }
-                chatMessages.appendChild(errorMsg);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-                return;
-            }
-
-            // Send message to Gemini
-            const result = await model.generateContent(systemPrompt + '\n\nUser: ' + message);
-            const response = await result.response;
-            const aiResponse = response.text();
+            // Send message to backend AI API
+            const response = await fetch('ai_chat.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: message })
+            });
 
             // Remove loading indicator
             if (chatMessages.contains(loadingMsg)) {
                 chatMessages.removeChild(loadingMsg);
+            }
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                // Show error message
+                const errorMsg = document.createElement('div');
+                errorMsg.className = 'flex justify-start';
+                errorMsg.innerHTML = `
+                    <div class="bg-red-100 text-red-900 px-4 py-2 rounded-lg max-w-xs text-sm rounded-tl-none">
+                        ⚠️ API Error: ${data.error || 'Failed to get response'}
+                    </div>
+                `;
+                chatMessages.appendChild(errorMsg);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                return;
             }
 
             // Add AI response
@@ -513,14 +460,14 @@ Keep responses concise, friendly, and relevant to government jobs. If a user ask
             aiMsg.className = 'flex justify-start';
             aiMsg.innerHTML = `
                 <div class="bg-gray-200 text-gray-900 px-4 py-2 rounded-lg max-w-xs text-sm rounded-tl-none">
-                    ${aiResponse}
+                    ${data.response}
                 </div>
             `;
             chatMessages.appendChild(aiMsg);
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
         } catch (error) {
-            console.error('❌ Error calling Gemini API:', error);
+            console.error('Chat error:', error);
             
             // Remove loading indicator
             if (chatMessages.contains(loadingMsg)) {

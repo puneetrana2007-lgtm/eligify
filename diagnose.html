@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🔍 Eligify AI - Diagnostic Console</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .header p { opacity: 0.9; }
+        .content { padding: 30px; }
+        .section { 
+            margin-bottom: 25px; 
+            padding: 20px;
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+        }
+        .section h2 { 
+            color: #333;
+            margin-bottom: 15px; 
+            font-size: 18px;
+        }
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .test-label { font-weight: 500; color: #333; }
+        .status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status.ok { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.pending { background: #fff3cd; color: #856404; }
+        .test-value {
+            color: #666;
+            font-size: 13px;
+            margin-top: 5px;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-test {
+            background: #667eea;
+            color: white;
+        }
+        .btn-test:hover { background: #5568d3; }
+        .btn-chat {
+            background: #764ba2;
+            color: white;
+        }
+        .btn-chat:hover { background: #653a8a; }
+        .output {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            margin-top: 15px;
+        }
+        .loading { 
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Eligify AI - Diagnostic Console</h1>
+            <p>Diagnose and test your Gemini API integration</p>
+        </div>
+        <div class="content">
+            
+            <!-- System Status Section -->
+            <div class="section">
+                <h2>📋 System Status</h2>
+                <div class="test-item">
+                    <span class="test-label">Environment</span>
+                    <span class="status ok" id="env-status">Loading...</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-label">Server</span>
+                    <span class="status ok" id="server-status">Loading...</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-label">.env File</span>
+                    <span class="status ok" id="env-file-status">Loading...</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-label">API Key Loaded</span>
+                    <span class="status ok" id="api-key-status">Loading...</span>
+                </div>
+                <div class="test-value" id="env-info"></div>
+            </div>
+
+            <!-- API Connection Test -->
+            <div class="section">
+                <h2>🔗 API Connection Test</h2>
+                <div class="test-item">
+                    <span class="test-label">cURL Available</span>
+                    <span class="status ok" id="curl-status">Loading...</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-label">API Endpoint</span>
+                    <span class="status ok" id="endpoint-status">Loading...</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-label">Network Connectivity</span>
+                    <span class="status ok" id="network-status">Loading...</span>
+                </div>
+            </div>
+
+            <!-- Chat Test -->
+            <div class="section">
+                <h2>💬 Chat Test</h2>
+                <div style="margin-bottom: 15px;">
+                    <input type="text" id="testMessage" placeholder="Test message (e.g., 'What is SSC?')" value="What is SSC CGL exam?" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                </div>
+                <div class="button-group">
+                    <button class="btn-test" onclick="runFullDiagnostic()">🔍 Full Diagnostic</button>
+                    <button class="btn-chat" onclick="testChat()">💬 Test Chat</button>
+                </div>
+                <div class="output" id="output" style="display: none;"></div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="section">
+                <h2>📊 Results</h2>
+                <div id="results"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const log = (msg) => console.log(msg);
+        const outputDiv = document.getElementById('output');
+
+        function showOutput(content) {
+            outputDiv.style.display = 'block';
+            outputDiv.innerHTML = content;
+        }
+
+        function addOutput(msg) {
+            outputDiv.innerHTML += msg + '\n';
+            outputDiv.scrollTop = outputDiv.scrollHeight;
+        }
+
+        async function runFullDiagnostic() {
+            showOutput('🔍 Running full diagnostic...\n\n');
+            
+            // 1. Check status.php
+            addOutput('1️⃣ Checking system status...');
+            try {
+                const statusRes = await fetch('status.php');
+                const statusData = await statusRes.json();
+                addOutput(JSON.stringify(statusData, null, 2));
+                
+                document.getElementById('env-info').innerHTML = JSON.stringify(statusData, null, 2);
+                document.getElementById('env-file-status').textContent = statusData['.env file'] === 'exists' ? '✓ Exists' : '✗ Missing';
+                document.getElementById('env-file-status').parentElement.querySelector('.status').className = statusData['.env file'] === 'exists' ? 'status ok' : 'status error';
+                document.getElementById('api-key-status').textContent = statusData['API Key Set'] === 'yes' ? '✓ Set' : '✗ Not Set';
+                document.getElementById('api-key-status').parentElement.querySelector('.status').className = statusData['API Key Set'] === 'yes' ? 'status ok' : 'status error';
+                document.getElementById('curl-status').textContent = statusData['cURL Available'] === 'yes' ? '✓ Available' : '✗ Not Available';
+                document.getElementById('curl-status').parentElement.querySelector('.status').className = statusData['cURL Available'] === 'yes' ? 'status ok' : 'status error';
+            } catch (e) {
+                addOutput('❌ Error: ' + e.message);
+            }
+
+            // 2. Test API
+            addOutput('\n2️⃣ Testing API endpoint...');
+            try {
+                const apiRes = await fetch('test_api.php');
+                const apiData = await apiRes.json();
+                addOutput(JSON.stringify(apiData, null, 2));
+                document.getElementById('endpoint-status').textContent = apiData.http_code === 200 ? '✓ Connected' : '✗ Error';
+                document.getElementById('endpoint-status').parentElement.querySelector('.status').className = apiData.http_code === 200 ? 'status ok' : 'status error';
+            } catch (e) {
+                addOutput('❌ Error: ' + e.message);
+                document.getElementById('endpoint-status').textContent = '✗ Failed';
+                document.getElementById('endpoint-status').parentElement.querySelector('.status').className = 'status error';
+            }
+
+            // 3. Test ai_chat.php directly
+            addOutput('\n3️⃣ Testing ai_chat.php endpoint...');
+            try {
+                const chatRes = await fetch('ai_chat.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: 'Test message' })
+                });
+                const chatData = await chatRes.json();
+                addOutput('Status: ' + chatRes.status);
+                addOutput(JSON.stringify(chatData, null, 2));
+            } catch (e) {
+                addOutput('❌ Error: ' + e.message);
+            }
+
+            addOutput('\n✅ Diagnostic complete!');
+        }
+
+        async function testChat() {
+            const message = document.getElementById('testMessage').value;
+            if (!message) {
+                alert('Please enter a test message');
+                return;
+            }
+
+            showOutput('💬 Sending test message: "' + message + '"\n\n');
+
+            try {
+                const response = await fetch('ai_chat.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+
+                addOutput('Response Status: ' + response.status);
+                const data = await response.json();
+                addOutput('\nServer Response:');
+                addOutput(JSON.stringify(data, null, 2));
+
+                if (data.success) {
+                    addOutput('\n✅ SUCCESS! AI Response:');
+                    addOutput(data.response);
+                } else {
+                    addOutput('\n⚠️ API Error: ' + (data.error || 'Unknown error'));
+                    addOutput('\nDebug Info:');
+                    addOutput(JSON.stringify(data.debug || {}, null, 2));
+                }
+            } catch (e) {
+                addOutput('❌ Network Error: ' + e.message);
+            }
+        }
+
+        // Auto-load status on page load
+        window.addEventListener('load', async () => {
+            try {
+                const res = await fetch('status.php');
+                const data = await res.json();
+                document.getElementById('env-info').innerHTML = JSON.stringify(data, null, 2);
+                document.getElementById('env-file-status').innerHTML = data['.env file'] === 'exists' ? '✓ Exists' : '✗ Missing';
+                document.getElementById('api-key-status').innerHTML = data['API Key Set'] === 'yes' ? '✓ Set' : '✗ Not Set';
+                document.getElementById('curl-status').innerHTML = data['cURL Available'] === 'yes' ? '✓ Available' : '✗ Not Available';
+            } catch (e) {
+                console.error('Failed to load status:', e);
+            }
+        });
+    </script>
+</body>
+</html>
